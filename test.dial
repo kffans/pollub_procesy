@@ -3,17 +3,17 @@ Tekst.
 Kolejny tekst.
 |
 &RANDOM > 70&
-	Ten tekst miał 70% szans na wyświetlenie.
+    Ten tekst miał 70% szans na wyświetlenie.
 ||
 &ELSE&
-	Ten tekst miał 30% szans na wyświetlenie.
+    Ten tekst miał 30% szans na wyświetlenie.
 ||
 |
 {
 {Wybór pierwszy}
-	Wybrałeś pierwszą opcję.
+    Wybrałeś pierwszą opcję.
 {Wybór drugi}
-	Wybrałeś drugą opcję.
+    Wybrałeś drugą opcję.
 }
 |
 Koniec treści

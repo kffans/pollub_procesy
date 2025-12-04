@@ -22,6 +22,7 @@ std::array<GLfloat,16> PROJECTION;
 #include "text.hpp"
 #define DIAL_DEBUG
 #include "dial.hpp"
+#include "test.hpp"
 
 #define u32 unsigned int
 #define elif else if
@@ -72,6 +73,13 @@ void scrollCallback (GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 int main () {
+    #ifdef TEST_HPP
+	test::givenUnformattedText_whenRemovedWhitespace_returnCleanText();
+	test::givenVariableInstruction_whenInstructionIsInterpreted_checkIfVariableChanged();
+    test::givenTestFile_whenInterpreted_returnInterpretedText();
+    #endif
+    
+    
     if (!glfwInit()) { return -1; }
 
     glfwWindowHint(GLFW_SAMPLES, 4);

@@ -1,1 +1,1 @@
-f:test,s:1762126845,v:Male = 1,v:Player = "Jakub Kwand",0,0,v:FALSE = 0,0,0,a:shy,1,v:RANDOM = 42,0,
+f:test,s:1764857826,0,0,v:RANDOM = 80,0,

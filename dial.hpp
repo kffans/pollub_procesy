@@ -2057,6 +2057,7 @@ namespace dial {
                                 if (IsTextVisible(state->displayText)) {
                                     ShowText(state, state->displayText);
                                 }
+								state->displayText = "";
                                 state->status = Status::FINISHED;
                                 goto Beginning;
                             }
