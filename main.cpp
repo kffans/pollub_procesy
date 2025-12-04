@@ -55,16 +55,12 @@ bool IsKeyInState (GLFWwindow* window, int code, int desiredState) {
 
 
 void windowRefreshCallback (GLFWwindow *window) {
-    //render();
-    //glfwSwapBuffers(window);
-    //glFinish(); // important, this waits until rendering result is actually visible, thus making resizing less ugly
 }
 
 void framebufferSizeCallback (GLFWwindow *window, int width, int height) {
     W_WIDTH = width;
     W_HEIGHT = height;
     PROJECTION[0] = 2.0f/W_WIDTH; PROJECTION[5] = 2.0f/W_HEIGHT;
-    // gl::UpdateProjectionUniforms();
     glViewport(0, 0, W_WIDTH, W_HEIGHT);
 }
 
@@ -74,9 +70,12 @@ void scrollCallback (GLFWwindow* window, double xoffset, double yoffset) {
 
 int main () {
     #ifdef TEST_HPP
-	test::givenUnformattedText_whenRemovedWhitespace_returnCleanText();
-	test::givenVariableInstruction_whenInstructionIsInterpreted_checkIfVariableChanged();
+    test::givenUnformattedText_whenRemovedWhitespace_returnCleanText();
+    test::givenVariableInstruction_whenInstructionIsInterpreted_checkIfVariableChanged();
+    test::givenConditionInstruction_whenInstructionIsInterpreted_checkIfTrue();
+    test::givenCurrentStatus_whenCheckCurrentStatus_checkIfTrue();
     test::givenTestFile_whenInterpreted_returnInterpretedText();
+    test::givenTestFile_whenInterpretedThenSavedAndLoaded_checkIfStateIsTheSameAsBefore();
     #endif
     
     
@@ -88,12 +87,10 @@ int main () {
     if (!window) { glfwTerminate(); return -1; }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-    // glfwSetWindowPos(window, 0, 30); 
 
     gladLoadGL(glfwGetProcAddress);
     glViewport(0, 0, W_WIDTH, W_HEIGHT);
     glEnable(GL_MULTISAMPLE);
-    // glEnable(GL_CULL_FACE); glCullFace(GL_BACK); glFrontFace(GL_CW); /* doesn't render the back face of objects, faster rendering? indices would need to be clockwise */
 
     PROJECTION = {
         2.0f/W_WIDTH, 0.0f,          0.0f, 0.0f,
@@ -112,8 +109,6 @@ int main () {
     font::Font* font = font::Font_I(28);
     dial::State* state = dial::State_I("test");
     
-    //double fontTime = 0.0;
-    
     std::vector<text::Text*> texts = {};
     
     while (!glfwWindowShouldClose(window)) {
@@ -121,9 +116,8 @@ int main () {
         glfwSetTime(0.0);
 
         if (!IS_PAUSED) {
-            /* tick functions */
+            /* loop functions */
             dial::Dialogue_T(state);
-
 
             /* keyboard events */
             if (dial::IsCurrentStatus(state, dial::Status::WAIT_FOR_CONTINUATION)) {
@@ -131,7 +125,6 @@ int main () {
                     dial::Continuation(state);
                 }
             }
-            //  dial::IsCurrentStatus(state, dial::Status::WAIT_FOR_CHOICE)
             if (dial::IsCurrentStatus(state, dial::Status::WAIT_FOR_CHOICE)) {
                 if (IsKeyInState(window, GLFW_KEY_A, GLFW_PRESS)) {
                     AccentDecrement(state);
@@ -163,18 +156,17 @@ int main () {
                 }
             }
 #ifdef DIAL_DEBUG
-            if (IsKeyInState(window, GLFW_KEY_BACKSPACE, GLFW_PRESS)) { /* debug backtracking function; press the backspace */
-                //system("cls");
+            if (IsKeyInState(window, GLFW_KEY_BACKSPACE, GLFW_PRESS)) { /* debug backtracking function */
                 dial::LoadBacktrackState(state);
             }
-            if (IsKeyInState(window, GLFW_KEY_D, GLFW_PRESS)) { /* debug */
+            if (IsKeyInState(window, GLFW_KEY_D, GLFW_PRESS)) { /* debug information */
                 std::cout<<"\n--------------------+\n";
                 if (state != nullptr) {
                     std::cout<<"Current position in file: "<<dial::GetCurrentTextFilePos(state->text, state->currentPos.text_i);
                 }
                 dial::ShowVars(state);
             }
-            if (IsKeyInState(window, GLFW_KEY_R, GLFW_PRESS)) { /* reset */
+            if (IsKeyInState(window, GLFW_KEY_R, GLFW_PRESS)) { /* reset text module */
                 system("cls");
                 dial::State_D(state);
                 state = dial::State_I("test");
@@ -185,10 +177,10 @@ int main () {
 
         }
 
-        if (IsKeyInState(window, GLFW_KEY_P, GLFW_PRESS)) { /* pause */
+        if (IsKeyInState(window, GLFW_KEY_P, GLFW_PRESS)) { /* pause program */
             IS_PAUSED = !IS_PAUSED;
         }
-        if (IsKeyInState(window, GLFW_KEY_Q, GLFW_PRESS) || IsKeyInState(window, GLFW_KEY_ESCAPE, GLFW_PRESS)) { /* quit */
+        if (IsKeyInState(window, GLFW_KEY_Q, GLFW_PRESS) || IsKeyInState(window, GLFW_KEY_ESCAPE, GLFW_PRESS)) { /* quit program */
             break;
         }
         
@@ -215,7 +207,7 @@ int main () {
                 (*it)->transform = lin::Translate(-400, tY - tYmax -200) * (*it)->transform;
                 tY += (*it)->lastCharPos.y - 28 - 10;
             }
-            if (state != nullptr && state->status == dial::Status::WAIT_FOR_CHOICE) { /* @TODO change this if statement when adding dialogue settings */
+            if (state != nullptr && state->status == dial::Status::WAIT_FOR_CHOICE) {
                 auto it = --texts.end();
                 int choices_s = (int)GetChoicesSize(state);
                 for (int choice_i = choices_s - 1; choice_i >= 0; choice_i--) {
@@ -235,8 +227,7 @@ int main () {
 
         glfwSwapBuffers(window);
         glfwPollEvents(); 
-    
-        /* @TODO remove on release, otherwise it saves cpu power drastically */
+
         Sleep(16);
     }
 

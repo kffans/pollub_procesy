@@ -4,33 +4,6 @@
 #define u32 unsigned int
 #define elif else if
 
-// NAMING CONVENTIONS:
-// functions might end with:
-// _I   init, initializing function or struct/class
-// _D   destroy, deallocate members of struct/class
-// _P   pointer allocated, destroy it later
-// _A   array allocated, destroy it later
-// _T   tick function
-//
-// variables might end with:
-// _s   size (of something)
-// _i   index
-// _c   count (of something)
-// _n   name (e.g filename)
-// _b   buffer, temporary
-//
-// bools start with:
-// is, has, was
-//
-// functions which return bool start with:
-// Is, Has, Was
-//
-// shortened names:
-// Instruction = instr
-// Conditional = cond
-// Position    = pos
-//
-
 namespace dial {
     using std::string;
     using std::map;
@@ -51,7 +24,7 @@ namespace dial {
     };
 
     struct TextObject {
-        string actor_n; /* @TODO does it need to be here? */
+        string actor_n;
         string text;
         TextType type;
     };
@@ -141,7 +114,7 @@ namespace dial {
         }
     }
 
-// // // ERROR-HANDLING FUNCTIONS // // //
+// ERROR-HANDLING FUNCTIONS
 
     string GetCurrentTextFilePos (char* txt, u32 target_i) {
         int line_c = 1; /* current line */
@@ -160,58 +133,22 @@ namespace dial {
         #ifdef DIAL_DEBUG
         std::cerr<<"\n:ERROR: "<<GetCurrentTextFilePos(txt, t_i)<<" "<<errText<<"\n\n";
         #endif
-        #ifndef DIAL_DEBUG
-        /* @TODO if not DIAL_DEBUG, then could save the errors to a log file */
-        #endif
     }
 
     void Error (string errText) {
         #ifdef DIAL_DEBUG
         std::cerr<<"\n:ERROR: "<<errText<<"\n\n";
         #endif
-        #ifndef DIAL_DEBUG
-        /* @TODO if not DIAL_DEBUG, then could save the errors to a log file */
-        #endif
     }
 
     #ifdef DIAL_DEBUG
-    //vector<State> backtrack;
-    //map<string, std::pair<int,string>> backtrackVars;
     bool isBacktrackLocked = false;
     void SaveBacktrackState (State* state) {
         if (state == nullptr) { return; }
-
-        /*
-        State backtrackStateSave;
-
-        backtrackStateSave.displayText = "";
-        backtrackStateSave.currentPos = state->currentPos;
-        backtrackStateSave.condElse = state->condElse;
-        backtrackStateSave.hasOneUseChoiceRecurred = state->hasOneUseChoiceRecurred;
-        backtrackStateSave.backtrackVars = Vars;
-
-        state->backtrack.push_back(backtrackStateSave);
-        */
     }
 
     void LoadBacktrackState (State* state) {
         if (state == nullptr) { return; }
-        
-        /*
-        if (state->backtrack.size() > 1) {
-            state->backtrack.pop_back();
-            State backtrack = state->backtrack.back();
-
-            state->displayText = "";
-            state->status = Status::INTERPRET;
-            state->currentPos = backtrack.currentPos;
-            state->condElse = backtrack.condElse;
-            state->hasOneUseChoiceRecurred = backtrack.hasOneUseChoiceRecurred;
-            Vars = backtrack.backtrackVars;
-
-            state->backtrack.pop_back();
-        }
-        */
     }
     #endif
 
@@ -979,7 +916,7 @@ namespace dial {
                     output.push_back(operators.back());
                     operators.pop_back();
                 }
-                if (!operators.empty()) { // @TODO ? should be without ! ??
+                if (!operators.empty()) {
                     operators.pop_back();
                     if (!operators.empty() && IsFunctionOperator(StringToOperator(operators.back()))) {
                         output.push_back(operators.back());
@@ -1094,7 +1031,6 @@ namespace dial {
                         }
                     }
 					else {
-						// @TODO check for errors
 						if (IsRightAssociativeOperator(op)) {
 							stackSegments.push_back("0"); stackValues.push_back(Operation(state, elementA, op, elementB));
 						}
@@ -1196,12 +1132,10 @@ namespace dial {
             }
             /* saves the game to a file */
             elif (textSegment == string("SAVE").substr(0, textLength)) {
-                // StateSave(state); /* @TODO */
                 wasCommandFound = true;
             }
             /* resets the values of 'temporary' variables (those starting with lowercase) */
             elif (textSegment == string("RESET").substr(0, textLength)) {
-                /*ResetVars();*/
                 wasCommandFound = true;
             }
             elif (textSegment == string("WAIT").substr(0, textLength)) {
@@ -1573,15 +1507,11 @@ namespace dial {
         }
         
         int choicePos_i = state->choices[choice_i].jumpPos.text_i;
-        //if (state->choices[i].instrText.length() != 0 && state->choices[i].instrText[0] == '~') {
-        state->hasOneUseChoiceRecurred[choicePos_i] = true; /* @TODO change the naming here, also delete this if statement */
-        //}
+        state->hasOneUseChoiceRecurred[choicePos_i] = true;
          
-        /* deletes from textObjs until it comes across a NORMAL or CHOICE_SELECTED type */
         while (state->textObjs.size() != 0 && state->textObjs.back().type != dial::TextType::NORMAL && state->textObjs.back().type != dial::TextType::CHOICE_SELECTED) { /* deletes until texttype == normal or size is 0 */
             state->textObjs.pop_back();
         }
-        /* then adds our selected choice to the textObjs pool */
         dial::AddTextObject(state, state->choices[choice_i].displayText, dial::TextType::CHOICE_SELECTED);
         
         dial::ShowRefreshedText(state);
@@ -1589,7 +1519,7 @@ namespace dial {
         state->currentPos = state->choices[choice_i].jumpPos;
         state->saveData.push_back(std::to_string(choice_i + 1));
         state->status = dial::Status::INTERPRET;
-        Dialogue_T(state); /* @TODO make it more elegant? */
+        Dialogue_T(state);
     }
     
     void Continuation (State* state) {

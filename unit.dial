@@ -11,10 +11,11 @@ Test 1
 $[2] Test == ((TRUE OR FALSE) AND 1)$
 Test 3
 |
-#Test = 1#Test 4
+Test 4#Test = 1#
 |
 &&
     [[2]]
+	|
     Test 5
 ||
 &(10 / 2) == (55 % 10 + 10 - 5 * 2)&
